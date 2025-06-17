@@ -1,0 +1,10 @@
+^F:\VULKAN\SOLUTIONS\HELLOWORLD\OUT\BUILD\X64-DEBUG\CMAKEFILES\A27B71EC2E41B8F59709CC37D6FBB68C\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SF:/Vulkan/Solutions/helloworld -BF:/Vulkan/Solutions/helloworld/out/build/x64-debug --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file F:/Vulkan/Solutions/helloworld/out/build/x64-debug/helloworld.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
