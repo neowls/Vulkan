@@ -33,3 +33,33 @@ add_custom_command(
             "${EXE_OUTPUT_DIR}/shaders/frag.spv"
     VERBATIM
 )
+
+# ImGui 경로(예시: 프로젝트/thirdparty/imgui)
+set(IMGUI_DIR "${CMAKE_SOURCE_DIR}/thirdparty/imgui")
+
+set(IMGUI_SOURCES
+    ${IMGUI_DIR}/imgui.cpp
+    ${IMGUI_DIR}/imgui_draw.cpp
+    ${IMGUI_DIR}/imgui_widgets.cpp
+    ${IMGUI_DIR}/imgui_tables.cpp
+    ${IMGUI_DIR}/imgui_demo.cpp
+    ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
+    ${IMGUI_DIR}/backends/imgui_impl_vulkan.cpp
+)
+
+set(IMGUI_HEADERS
+    ${IMGUI_DIR}/imgui.h
+    ${IMGUI_DIR}/imgui_internal.h
+    ${IMGUI_DIR}/imconfig.h
+    ${IMGUI_DIR}/imstb_rectpack.h
+    ${IMGUI_DIR}/imstb_textedit.h
+    ${IMGUI_DIR}/imstb_truetype.h
+    ${IMGUI_DIR}/backends/imgui_impl_glfw.h
+    ${IMGUI_DIR}/backends/imgui_impl_vulkan.h
+)
+
+# 실행 파일에 소스 포함
+target_sources(helloworld PRIVATE ${IMGUI_SOURCES})
+target_include_directories(helloworld PRIVATE ${IMGUI_DIR} ${IMGUI_DIR}/backends)
+
+target_compile_definitions(helloworld PRIVATE IMGUI_IMPL_VULKAN_NO_PROTOTYPES)
