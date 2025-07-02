@@ -1,5 +1,6 @@
-#include <iostream>
+#include <stdexcept>
 #include "Framebuffer.h"
+#include "GraphicsPipeline.h"
 
 namespace Framebuffer
 {
@@ -19,6 +20,8 @@ namespace Framebuffer
             info.width = extent.width;
             info.height = extent.height;
             info.layers = 1;
+
+
             if (vkCreateFramebuffer(device, &info, nullptr, &framebuffers[i]) != VK_SUCCESS)
                 throw std::runtime_error("프레임버퍼 생성 실패");
         }

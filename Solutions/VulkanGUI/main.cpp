@@ -6,11 +6,16 @@
 #include "Swapchain.h"
 #include "RenderPass.h"
 #include "Framebuffer.h"
+#include "GraphicsPipeline.h"
+#include "CommandBuffer.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_vulkan.h"
 
 using namespace VulkanUtils;
+
+#define WIDTH 1280
+#define HEIGHT 720
 
 #ifdef _DEBUG
 #define APP_USE_VULKAN_DEBUG_REPORT
@@ -20,7 +25,16 @@ static VkDebugReportCallbackEXT g_DebugReport = VK_NULL_HANDLE;
 GLFWwindow* window = VK_NULL_HANDLE;
 VkSurfaceKHR g_Surface = VK_NULL_HANDLE;
 
+VkSemaphore imageAvailableSemaphore;
+VkSemaphore renderFinishedSemaphore;
+VkFence inFlightFence;
+
 static ImGui_ImplVulkanH_Window  g_MainWindowData;
+
+void initWindow();
+void mainLoop();
+void cleanupAll();
+void drawFrame();
 
 static void SetupVulkanWindow(ImGui_ImplVulkanH_Window* wd, VkSurfaceKHR surface, int width, int height)
 {
@@ -52,6 +66,44 @@ static void SetupVulkanWindow(ImGui_ImplVulkanH_Window* wd, VkSurfaceKHR surface
 	// Create SwapChain, RenderPass, Framebuffer, etc.
 	IM_ASSERT(g_MinImageCount >= 2);
 	ImGui_ImplVulkanH_CreateOrResizeWindow(g_Instance, g_PhysicalDevice, g_Device, wd, g_QueueFamily, g_Allocator, width, height, g_MinImageCount);
+}
+
+void initWindow()
+{
+	if (!glfwInit())
+	{
+		throw std::runtime_error("GLFW 초기화 실패.");
+	}
+
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+	window = glfwCreateWindow(WIDTH, HEIGHT, "ImGui + Vulkan + GLFW", nullptr, nullptr);
+	if (!window)
+	{
+		throw std::runtime_error("윈도우 생성 실패");
+	}
+}
+
+// 메인 루프
+void mainLoop()
+{
+	while (!glfwWindowShouldClose(window))
+	{
+		glfwPollEvents();
+		drawFrame();
+	}
+}
+
+void createSyncObjects()
+{
+	VkSemaphoreCreateInfo semInfo{ VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO };
+	if (vkCreateSemaphore(g_Device, &semInfo, nullptr, &imageAvailableSemaphore) != VK_SUCCESS ||
+		vkCreateSemaphore(g_Device, &semInfo, nullptr, &renderFinishedSemaphore) != VK_SUCCESS)
+		throw std::runtime_error("세마포어 생성 실패");
+
+	VkFenceCreateInfo fenceInfo{ VK_STRUCTURE_TYPE_FENCE_CREATE_INFO };
+	fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+	if (vkCreateFence(g_Device, &fenceInfo, nullptr, &inFlightFence) != VK_SUCCESS)
+		throw std::runtime_error("펜스 생성 실패");
 }
 
 bool createInstance()
@@ -188,6 +240,9 @@ void InitImGui(GLFWwindow* window)
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
 
+	ImGuiIO& io = ImGui::GetIO();
+	io.Fonts->AddFontFromFileTTF("C:/NotoSansKR-Regular.ttf", 18.0f, nullptr, io.Fonts->GetGlyphRangesKorean());
+
 	//	GLFW_IMGUI 연동
 	ImGui_ImplGlfw_InitForVulkan(window, true);
 
@@ -232,157 +287,159 @@ void InitImGui(GLFWwindow* window)
 	init_info.RenderPass = RenderPass::renderPass;
 
 	ImGui_ImplVulkan_Init(&init_info);
+
+
 }
 
 //	전체 자원 해제
 void cleanupAll()
 {
 	vkDeviceWaitIdle(g_Device);
-	ImGui_ImplVulkan_Shutdown();
-	ImGui_ImplGlfw_Shutdown();
-	ImGui::DestroyContext();
+	CommandBuffer::cleanup(g_Device, g_CommandPool);
 	Framebuffer::cleanup(g_Device);
 	RenderPass::cleanup(g_Device);
 	Swapchain::cleanup(g_Device);
+
+	ImGui_ImplVulkan_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+
+	ImGui::DestroyContext();
+
 	vkDestroyDescriptorPool(g_Device, g_DescriptorPool, g_Allocator);
 	vkDestroyCommandPool(g_Device, g_CommandPool, g_Allocator);
 	vkDestroyDevice(g_Device, g_Allocator);
 	vkDestroySurfaceKHR(g_Instance, g_Surface, g_Allocator);
 	if (debugMessenger != VK_NULL_HANDLE) DestroyDebugUtilsMessengerEXT(g_Instance, debugMessenger, g_Allocator);
 	vkDestroyInstance(g_Instance, g_Allocator);
-}
-
-void cleanupVulkan()
-{
-	vkDestroyCommandPool(g_Device, g_CommandPool, g_Allocator);
-	vkDestroyDevice(g_Device, g_Allocator);
-	if (debugMessenger != VK_NULL_HANDLE) DestroyDebugUtilsMessengerEXT(g_Instance, debugMessenger, nullptr);
+	glfwDestroyWindow(window);
+	glfwTerminate();
 }
 
 void drawFrame()
 {
 	static uint32_t imageIndex = 0;
 
-	//	스왑체인으로부터 다음 이미지 확보
-	VkSemaphore imageAvailableSemaphore;
-	VkSemaphore renderFinishedSemaphore;
-	VkFence inFlightFence;
-
 	vkWaitForFences(g_Device, 1, &inFlightFence, VK_TRUE, UINT64_MAX);
 	vkResetFences(g_Device, 1, &inFlightFence);
 
 	VkResult result = vkAcquireNextImageKHR(g_Device, Swapchain::swapchain, UINT64_MAX, imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
-	if (result != VK_SUCCESS)
+	if (result == VK_ERROR_OUT_OF_DATE_KHR)
 	{
 		// 스왑체인 리빌드 할 것
 		return;
 	}
+	if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
+	{
+		throw std::runtime_error("Failed to acquire swapchain image.");
+	}
 
-	//	커맨드 버퍼 기록
-	VkCommandBuffer commandBuffer = beginSingleTimeCommands();
+	ImGui_ImplVulkan_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
 
-	//	렌더 패스 시작
-	VkClearValue clearValue = {};
-	clearValue.color = { { 0.1f, 0.1f, 0.1f, 1.0f } };
-	VkRenderPassBeginInfo renderPassInfo = {};
+	ImGui::Begin("ImGui + Vulkan");
+	ImGui::Text("Success");
+	ImGui::Text("한글 테스트");
+	ImGui::End();
+
+	ImGui::Render();
+
+	VkCommandBuffer cmd = CommandBuffer::commandBuffers[imageIndex];
+	VkCommandBufferBeginInfo beginInfo{};
+	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	vkBeginCommandBuffer(cmd, &beginInfo);
+
+	// 3. RenderPass 시작
+	VkClearValue clearValue = { { {0.15f, 0.15f, 0.15f, 1.0f} } };
+	VkRenderPassBeginInfo renderPassInfo{};
 	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 	renderPassInfo.renderPass = RenderPass::renderPass;
 	renderPassInfo.framebuffer = Framebuffer::framebuffers[imageIndex];
+	renderPassInfo.renderArea.offset = { 0, 0 };
 	renderPassInfo.renderArea.extent = Swapchain::extent;
 	renderPassInfo.clearValueCount = 1;
 	renderPassInfo.pClearValues = &clearValue;
 
-	vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+	vkCmdBeginRenderPass(cmd, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-	//	ImGui DrawData 를 Vulkan 커맨드 버퍼에 기록
-	ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);
+	// ImGui DrawData를 실제로 렌더
+	ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), cmd);
 
-	vkCmdEndRenderPass(commandBuffer);
-	vkEndCommandBuffer(commandBuffer);
 
-	//	그래픽 큐에 제출
-	VkSubmitInfo submitInfo = {};
-	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-	VkSemaphore waitSemaphores[] = { imageAvailableSemaphore };
+	vkCmdEndRenderPass(cmd);
+	vkEndCommandBuffer(cmd);
+
+	// 큐 제출 (세마포어 동기화)
 	VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+	VkSubmitInfo submitInfo{};
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 	submitInfo.waitSemaphoreCount = 1;
-	submitInfo.pWaitSemaphores = waitSemaphores;
+	submitInfo.pWaitSemaphores = &imageAvailableSemaphore;
 	submitInfo.pWaitDstStageMask = waitStages;
 	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &commandBuffer;
-	VkSemaphore signalSemaphores[] = { renderFinishedSemaphore };
+	submitInfo.pCommandBuffers = &cmd;
 	submitInfo.signalSemaphoreCount = 1;
-	submitInfo.pSignalSemaphores = signalSemaphores;
+	submitInfo.pSignalSemaphores = &renderFinishedSemaphore;
 
-	if (vkQueueSubmit(g_Queue, 1, &submitInfo, inFlightFence) != VK_SUCCESS) 
-	{
-		throw std::runtime_error("명령 버퍼를 그래픽 큐에 제출하는데 실패.\n");
+	if (vkQueueSubmit(g_Queue, 1, &submitInfo, inFlightFence) != VK_SUCCESS) {
+		throw std::runtime_error("Failed to submit draw command buffer");
 	}
 
 	//	프레젠테이션
 	VkPresentInfoKHR presentInfo{};
 	presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 	presentInfo.waitSemaphoreCount = 1;
-	presentInfo.pWaitSemaphores = signalSemaphores;
+	presentInfo.pWaitSemaphores = &renderFinishedSemaphore;
 	presentInfo.swapchainCount = 1;
 	presentInfo.pSwapchains = &Swapchain::swapchain;
 	presentInfo.pImageIndices = &imageIndex;
 
-	vkQueuePresentKHR(g_Queue, &presentInfo);
+	result = vkQueuePresentKHR(g_Queue, &presentInfo);
+
+	// VK_ERROR_OUT_OF_DATE_KHR (윈도우 크기 변경 등) 처리
+	if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
+		// swapchain recreate 필요
+		// recreateSwapchain();
+	}
+	else if (result != VK_SUCCESS) {
+		throw std::runtime_error("Failed to present swapchain image!");
+	}
 }
 
 int main()
 {
-	if (!glfwInit())
+	try
 	{
-		std::cerr << "GLFW 초기화 실패!\n";
+		initWindow();
+
+		// Vulkan 리소스 및 ImGui 초기화
+		initVulkan(window);
+		createSyncObjects();
+
+		Swapchain::setup(window, g_PhysicalDevice, g_Device, g_Surface, g_QueueFamily);
+		RenderPass::setup(g_Device, Swapchain::imageFormat);
+		Framebuffer::setup(g_Device, Swapchain::extent, RenderPass::renderPass, Swapchain::imageViews);
+		CommandBuffer::create(g_Device, g_CommandPool, Framebuffer::framebuffers.size());
+
+		ImGui_ImplVulkan_LoadFunctions(
+			VK_API_VERSION_1_0,
+			[](const char* function_name, void* user_data) -> PFN_vkVoidFunction {
+				return vkGetInstanceProcAddr(
+					static_cast<VkInstance>(user_data),
+					function_name
+				);
+			},
+			g_Instance
+		);
+
+		InitImGui(window);
+		mainLoop();
+		cleanupAll();
+		return 0;
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << "예외 발생 : " << e.what() << std::endl;
 		return -1;
 	}
-
-	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); // Vulkan 용
-	GLFWwindow* window = glfwCreateWindow(1280, 720, "ImGui + Vulkan + GLFW", nullptr, nullptr);
-
-	initVulkan(window);	//	Vulkan + Surface + Pool
-
-	Swapchain::setup(window, g_PhysicalDevice, g_Device, g_Surface, g_QueueFamily);
-	RenderPass::setup(g_Device, Swapchain::imageFormat);
-	Framebuffer::setup(g_Device, Swapchain::extent, RenderPass::renderPass, Swapchain::imageViews);
-
-	ImGui_ImplVulkan_LoadFunctions(
-		VK_API_VERSION_1_0,
-		[](const char* function_name, void* user_data) -> PFN_vkVoidFunction {
-			return vkGetInstanceProcAddr(
-				static_cast<VkInstance>(user_data),
-				function_name
-			);
-		},
-		g_Instance
-	);
-
-	InitImGui(window);
-
-	// 메인 루프
-	while (!glfwWindowShouldClose(window))
-	{
-		glfwPollEvents();
-
-		ImGui_ImplVulkan_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
-		ImGui::NewFrame();
-
-		//	ImGui UI
-		ImGui::Begin("Hello, ImGui + Vulkan");
-		ImGui::Text("실행 성공");
-		ImGui::End();
-
-		ImGui::Render();
-
-		drawFrame();
-	}
-
-	cleanupAll();
-
-	glfwDestroyWindow(window);
-	glfwTerminate();
-	return 0;
 }
