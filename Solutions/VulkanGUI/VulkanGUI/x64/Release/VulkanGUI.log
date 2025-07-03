@@ -1,0 +1,35 @@
+﻿  ChatUI.cpp
+  CommandBuffer.cpp
+  Framebuffer.cpp
+  GraphicsPipeline.cpp
+  main.cpp
+C:\vcpkg-master\installed\x64-windows\include\GLFW\glfw3.h(3235,1): warning C4819: 현재 코드 페이지(949)에서 표시할 수 없는 문자가 파일에 들어 있습니다. 데이터가 손실되지 않게 하려면 해당 파일을 유니코드 형식으로 저장하십시오.
+  (소스 파일 'main.cpp'을(를) 컴파일하는 중)
+  
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\shared\minwindef.h(130,9): warning C4005: 'APIENTRY': 매크로 재정의
+  (소스 파일 'main.cpp'을(를) 컴파일하는 중)
+      C:\vcpkg-master\installed\x64-windows\include\GLFW\glfw3.h(123,11):
+      'APIENTRY'의 이전 정의를 참조하십시오.
+  
+  RenderPass.cpp
+  Swapchain.cpp
+C:\vcpkg-master\installed\x64-windows\include\GLFW\glfw3.h(3235,1): warning C4819: 현재 코드 페이지(949)에서 표시할 수 없는 문자가 파일에 들어 있습니다. 데이터가 손실되지 않게 하려면 해당 파일을 유니코드 형식으로 저장하십시오.
+  (소스 파일 'Swapchain.cpp'을(를) 컴파일하는 중)
+  
+  imgui_impl_glfw.cpp
+C:\vcpkg-master\installed\x64-windows\include\GLFW\glfw3.h(3235,1): warning C4819: 현재 코드 페이지(949)에서 표시할 수 없는 문자가 파일에 들어 있습니다. 데이터가 손실되지 않게 하려면 해당 파일을 유니코드 형식으로 저장하십시오.
+  (소스 파일 'thirdparty/imgui/backends/imgui_impl_glfw.cpp'을(를) 컴파일하는 중)
+  
+  imgui_impl_vulkan.cpp
+  imgui.cpp
+  imgui_demo.cpp
+  imgui_draw.cpp
+  imgui_tables.cpp
+  imgui_widgets.cpp
+  imgui_stdlib.cpp
+  VulkanUtils.cpp
+  코드를 생성하고 있습니다.
+  Previous IPDB not found, fall back to full compilation.
+  All 2588 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  코드를 생성했습니다.
+  VulkanGUI.vcxproj -> F:\Vulkan\Solutions\VulkanGUI\x64\Release\VulkanGUI.exe

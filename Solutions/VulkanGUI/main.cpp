@@ -1,16 +1,26 @@
-#include <vulkan/vulkan.h>
+ï»¿#include <vulkan/vulkan.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <vector>
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <thread>
+#include <atomic>
+#include <string>
+#include <mutex>
+#include <exception>
 #include "VulkanUtils.h"
 #include "Swapchain.h"
 #include "RenderPass.h"
 #include "Framebuffer.h"
 #include "GraphicsPipeline.h"
 #include "CommandBuffer.h"
+#include "ChatUI.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_vulkan.h"
+
+#pragma comment(lib, "ws2_32.lib")
 
 using namespace VulkanUtils;
 
@@ -24,6 +34,7 @@ static VkDebugReportCallbackEXT g_DebugReport = VK_NULL_HANDLE;
 
 GLFWwindow* window = VK_NULL_HANDLE;
 VkSurfaceKHR g_Surface = VK_NULL_HANDLE;
+ImFont* g_FontKR = nullptr;
 
 VkSemaphore imageAvailableSemaphore;
 VkSemaphore renderFinishedSemaphore;
@@ -31,10 +42,89 @@ VkFence inFlightFence;
 
 static ImGui_ImplVulkanH_Window  g_MainWindowData;
 
+std::vector<std::string> chatMessages;
+std::mutex chatMutex;
+std::atomic<bool> running(true);
+
+SOCKET sock = INVALID_SOCKET;
+
+ChatUI::Callbacks chatCallbacks
+{
+	//	ë°© ìƒì„±
+	[](const std::string& nickname)
+	{
+	},
+	//	ë°© ì°¸ê°€
+	[](const std::string& nickname, const std::string& ip)
+	{
+	},
+	//	ë©”ì„¸ì§€ ì „ì†¡
+	[](const std::string& message)
+	{
+		chatMessages.push_back(ChatUI::nickname + " : " + message);
+	}
+};
+
 void initWindow();
 void mainLoop();
 void cleanupAll();
 void drawFrame();
+
+void SocketReceiveThread(SOCKET sock) 
+{
+	char buf[1024];
+	while (running) 
+	{
+		int n = recv(sock, buf, sizeof(buf) - 1, 0);
+		if (n > 0) 
+		{
+			buf[n] = 0;
+			std::lock_guard<std::mutex> lock(chatMutex);
+			chatMessages.emplace_back(buf);
+		}
+		else 
+		{
+			running = false;
+			break;
+		}
+	}
+}
+
+bool ConnectToServer(const char* server_ip, const char* nickname) 
+{
+	// Winsock ì´ˆê¸°í™”
+	WSADATA wsaData;
+	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
+		return false;
+
+	sock = socket(AF_INET, SOCK_STREAM, 0);
+	if (sock == INVALID_SOCKET) return false;
+
+	sockaddr_in serv_addr = {};
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_port = htons(8888);
+	inet_pton(AF_INET, server_ip, &serv_addr.sin_addr);
+
+	if (connect(sock, (SOCKADDR*)&serv_addr, sizeof(serv_addr)) == SOCKET_ERROR)
+		return false;
+
+	// í† í° ì—†ì´ ë‹¨ì¼ í´ë¼ì´ì–¸íŠ¸ í…ŒìŠ¤íŠ¸ ì‹œ
+	std::string login_msg = "dummy INPUT ";
+	login_msg += nickname;
+	login_msg += "\n";
+	send(sock, login_msg.c_str(), (int)login_msg.size(), 0);
+
+	return true;
+}
+
+void CleanupSocket() 
+{
+	running = false;
+	if (sock != INVALID_SOCKET) closesocket(sock);
+	WSACleanup();
+}
+
+
 
 static void SetupVulkanWindow(ImGui_ImplVulkanH_Window* wd, VkSurfaceKHR surface, int width, int height)
 {
@@ -72,18 +162,18 @@ void initWindow()
 {
 	if (!glfwInit())
 	{
-		throw std::runtime_error("GLFW ÃÊ±âÈ­ ½ÇÆĞ.");
+		throw std::runtime_error("GLFW ì´ˆê¸°í™” ì‹¤íŒ¨.");
 	}
 
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 	window = glfwCreateWindow(WIDTH, HEIGHT, "ImGui + Vulkan + GLFW", nullptr, nullptr);
 	if (!window)
 	{
-		throw std::runtime_error("À©µµ¿ì »ı¼º ½ÇÆĞ");
+		throw std::runtime_error("ìœˆë„ìš° ìƒì„± ì‹¤íŒ¨");
 	}
 }
 
-// ¸ŞÀÎ ·çÇÁ
+// ë©”ì¸ ë£¨í”„
 void mainLoop()
 {
 	while (!glfwWindowShouldClose(window))
@@ -98,12 +188,12 @@ void createSyncObjects()
 	VkSemaphoreCreateInfo semInfo{ VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO };
 	if (vkCreateSemaphore(g_Device, &semInfo, nullptr, &imageAvailableSemaphore) != VK_SUCCESS ||
 		vkCreateSemaphore(g_Device, &semInfo, nullptr, &renderFinishedSemaphore) != VK_SUCCESS)
-		throw std::runtime_error("¼¼¸¶Æ÷¾î »ı¼º ½ÇÆĞ");
+		throw std::runtime_error("ì„¸ë§ˆí¬ì–´ ìƒì„± ì‹¤íŒ¨");
 
 	VkFenceCreateInfo fenceInfo{ VK_STRUCTURE_TYPE_FENCE_CREATE_INFO };
 	fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 	if (vkCreateFence(g_Device, &fenceInfo, nullptr, &inFlightFence) != VK_SUCCESS)
-		throw std::runtime_error("Ææ½º »ı¼º ½ÇÆĞ");
+		throw std::runtime_error("íœìŠ¤ ìƒì„± ì‹¤íŒ¨");
 }
 
 bool createInstance()
@@ -118,7 +208,7 @@ bool createInstance()
 	createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 	createInfo.pApplicationInfo = &appInfo;
 
-	// GLFW°¡ ÇÊ¿äÇÑ extension ¹Ş¾Æ¿À±â
+	// GLFWê°€ í•„ìš”í•œ extension ë°›ì•„ì˜¤ê¸°
 	uint32_t extCount = 0;
 	const char** extensions = glfwGetRequiredInstanceExtensions(&extCount);
 	createInfo.enabledExtensionCount = extCount;
@@ -126,7 +216,7 @@ bool createInstance()
 
 	if (vkCreateInstance(&createInfo, g_Allocator, &g_Instance) != VK_SUCCESS)
 	{
-		std::cerr << "Vulkan ÀÎ½ºÅÏ½º »ı¼º ½ÇÆĞ.\n";
+		std::cerr << "Vulkan ì¸ìŠ¤í„´ìŠ¤ ìƒì„± ì‹¤íŒ¨.\n";
 		return false;
 	}
 	return true;
@@ -134,7 +224,7 @@ bool createInstance()
 
 void initVulkan(GLFWwindow* window)
 {
-	// Vulkan ÀÎ½ºÅÏ½º »ı¼º
+	// Vulkan ì¸ìŠ¤í„´ìŠ¤ ìƒì„±
 	if (!createInstance())
 	{
 		glfwDestroyWindow(window);
@@ -142,18 +232,18 @@ void initVulkan(GLFWwindow* window)
 		return;
 	}
 
-	// µğ¹ö±× ¸Ş½ÃÁö(Messenger) »ı¼º (¿É¼Ç)
+	// ë””ë²„ê·¸ ë©”ì‹œì§€(Messenger) ìƒì„± (ì˜µì…˜)
 	VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
 	VulkanUtils::populateDebugMessengerCreateInfo(debugCreateInfo);
 	VulkanUtils::CreateDebugUtilsMessengerEXT(g_Instance, &debugCreateInfo, nullptr, &debugMessenger);
 
 
-	// ¹°¸® µğ¹ÙÀÌ½º ¼±ÅÃ
+	// ë¬¼ë¦¬ ë””ë°”ì´ìŠ¤ ì„ íƒ
 	uint32_t deviceCount = 0;
 	vkEnumeratePhysicalDevices(g_Instance, &deviceCount, nullptr);
 	if (deviceCount == 0)
 	{
-		std::cerr << "Vulkan Áö¿ø GPU ¾øÀ½.\n";
+		std::cerr << "Vulkan ì§€ì› GPU ì—†ìŒ.\n";
 		vkDestroyInstance(g_Instance, nullptr);
 		glfwDestroyWindow(window);
 		glfwTerminate();
@@ -162,10 +252,10 @@ void initVulkan(GLFWwindow* window)
 
 	std::vector<VkPhysicalDevice> physicalDevices(deviceCount);
 	vkEnumeratePhysicalDevices(g_Instance, &deviceCount, physicalDevices.data());
-	g_PhysicalDevice = physicalDevices[0]; // Ã¹¹øÂ° GPU »ç¿ë
+	g_PhysicalDevice = physicalDevices[0]; // ì²«ë²ˆì§¸ GPU ì‚¬ìš©
 
 
-	// Å¥ ÆĞ¹Ğ¸® Å½»ö
+	// í íŒ¨ë°€ë¦¬ íƒìƒ‰
 	uint32_t queueFamilyCount = 0;
 	vkGetPhysicalDeviceQueueFamilyProperties(g_PhysicalDevice, &queueFamilyCount, nullptr);
 	std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
@@ -182,7 +272,7 @@ void initVulkan(GLFWwindow* window)
 
 	if (g_QueueFamily == -1)
 	{
-		std::cerr << "±×·¡ÇÈ Å¥¸¦ Áö¿øÇÏ´Â ÆĞ¹Ğ¸®°¡ ¾øÀ½.\n";
+		std::cerr << "ê·¸ë˜í”½ íë¥¼ ì§€ì›í•˜ëŠ” íŒ¨ë°€ë¦¬ê°€ ì—†ìŒ.\n";
 		vkDestroyInstance(g_Instance, nullptr);
 		glfwDestroyWindow(window);
 		glfwTerminate();
@@ -191,7 +281,7 @@ void initVulkan(GLFWwindow* window)
 
 	const char* deviceExtensions[] = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 
-	// ³í¸® µğ¹ÙÀÌ½º ¹× Å¥ »ı¼º
+	// ë…¼ë¦¬ ë””ë°”ì´ìŠ¤ ë° í ìƒì„±
 	float queuePriority = 1.0f;
 	VkDeviceQueueCreateInfo queueCreateInfo = {};
 	queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -208,24 +298,24 @@ void initVulkan(GLFWwindow* window)
 
 	if (vkCreateDevice(g_PhysicalDevice, &deviceCreateInfo, g_Allocator, &g_Device) != VK_SUCCESS)
 	{
-		std::cerr << "³í¸® µğ¹ÙÀÌ½º »ı¼º ½ÇÆĞ.\n";
+		std::cerr << "ë…¼ë¦¬ ë””ë°”ì´ìŠ¤ ìƒì„± ì‹¤íŒ¨.\n";
 		return;
 	}
 
 	vkGetDeviceQueue(g_Device, g_QueueFamily, 0, &g_Queue);
 
-	// Ä¿¸Çµå Ç® »ı¼º
+	// ì»¤ë§¨ë“œ í’€ ìƒì„±
 	VkCommandPoolCreateInfo poolInfo{};
 	poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 	poolInfo.queueFamilyIndex = g_QueueFamily;
 	poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 	if (vkCreateCommandPool(g_Device, &poolInfo, nullptr, &g_CommandPool) != VK_SUCCESS)
-		throw std::runtime_error("vkCreateCommandPool ½ÇÆĞ.");
+		throw std::runtime_error("vkCreateCommandPool ì‹¤íŒ¨.");
 
-	// Vulkan ¼­ÆäÀÌ½º »ı¼º
+	// Vulkan ì„œí˜ì´ìŠ¤ ìƒì„±
 	if (glfwCreateWindowSurface(g_Instance, window, g_Allocator, &g_Surface) != VK_SUCCESS)
 	{
-		std::cerr << "Vulkan ¼­ÆäÀÌ½º »ı¼º ½ÇÆĞ.\n";
+		std::cerr << "Vulkan ì„œí˜ì´ìŠ¤ ìƒì„± ì‹¤íŒ¨.\n";
 		vkDestroyInstance(g_Instance, nullptr);
 		glfwDestroyWindow(window);
 		glfwTerminate();
@@ -235,18 +325,20 @@ void initVulkan(GLFWwindow* window)
 
 void InitImGui(GLFWwindow* window)
 {
-	//	ImGui Context ½ºÅ¸ÀÏ
+	//	ImGui Context ìŠ¤íƒ€ì¼
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
 
 	ImGuiIO& io = ImGui::GetIO();
-	io.Fonts->AddFontFromFileTTF("C:/NotoSansKR-Regular.ttf", 18.0f, nullptr, io.Fonts->GetGlyphRangesKorean());
+	io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/malgun.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesKorean());
+	
 
-	//	GLFW_IMGUI ¿¬µ¿
+	//	GLFW_IMGUI ì—°ë™
 	ImGui_ImplGlfw_InitForVulkan(window, true);
 
-	// µğ½ºÅ©¸³ÅÍ Ç® ÁØºñ
+
+	// ë””ìŠ¤í¬ë¦½í„° í’€ ì¤€ë¹„
 	VkDescriptorPoolSize pool_sizes[] =
 	{
 		{ VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
@@ -267,9 +359,9 @@ void InitImGui(GLFWwindow* window)
 	pool_info.poolSizeCount = (uint32_t)IM_ARRAYSIZE(pool_sizes);
 	pool_info.pPoolSizes = pool_sizes;
 	if (vkCreateDescriptorPool(g_Device, &pool_info, g_Allocator, &g_DescriptorPool) != VK_SUCCESS)
-		throw std::runtime_error("µğ½ºÅ©¸³ÅÍ Ç® »ı¼º ½ÇÆĞ.");
+		throw std::runtime_error("ë””ìŠ¤í¬ë¦½í„° í’€ ìƒì„± ì‹¤íŒ¨.");
 
-	//	ImGui Vulkan ÃÊ±âÈ­
+	//	ImGui Vulkan ì´ˆê¸°í™”
 	ImGui_ImplVulkan_InitInfo init_info = {};
 	init_info.Instance = g_Instance;
 	init_info.PhysicalDevice = g_PhysicalDevice;
@@ -287,11 +379,10 @@ void InitImGui(GLFWwindow* window)
 	init_info.RenderPass = RenderPass::renderPass;
 
 	ImGui_ImplVulkan_Init(&init_info);
-
-
+	ImGui_ImplVulkan_NewFrame();
 }
 
-//	ÀüÃ¼ ÀÚ¿ø ÇØÁ¦
+//	ì „ì²´ ìì› í•´ì œ
 void cleanupAll()
 {
 	vkDeviceWaitIdle(g_Device);
@@ -325,7 +416,7 @@ void drawFrame()
 	VkResult result = vkAcquireNextImageKHR(g_Device, Swapchain::swapchain, UINT64_MAX, imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
 	if (result == VK_ERROR_OUT_OF_DATE_KHR)
 	{
-		// ½º¿ÒÃ¼ÀÎ ¸®ºôµå ÇÒ °Í
+		// ìŠ¤ì™‘ì²´ì¸ ë¦¬ë¹Œë“œ í•  ê²ƒ
 		return;
 	}
 	if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
@@ -337,10 +428,7 @@ void drawFrame()
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 
-	ImGui::Begin("ImGui + Vulkan");
-	ImGui::Text("Success");
-	ImGui::Text("ÇÑ±Û Å×½ºÆ®");
-	ImGui::End();
+	ChatUI::Render(chatMessages, chatCallbacks);
 
 	ImGui::Render();
 
@@ -349,7 +437,7 @@ void drawFrame()
 	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 	vkBeginCommandBuffer(cmd, &beginInfo);
 
-	// 3. RenderPass ½ÃÀÛ
+	// 3. RenderPass ì‹œì‘
 	VkClearValue clearValue = { { {0.15f, 0.15f, 0.15f, 1.0f} } };
 	VkRenderPassBeginInfo renderPassInfo{};
 	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -362,14 +450,14 @@ void drawFrame()
 
 	vkCmdBeginRenderPass(cmd, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-	// ImGui DrawData¸¦ ½ÇÁ¦·Î ·»´õ
+	// ImGui DrawDataë¥¼ ì‹¤ì œë¡œ ë Œë”
 	ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), cmd);
 
 
 	vkCmdEndRenderPass(cmd);
 	vkEndCommandBuffer(cmd);
 
-	// Å¥ Á¦Ãâ (¼¼¸¶Æ÷¾î µ¿±âÈ­)
+	// í ì œì¶œ (ì„¸ë§ˆí¬ì–´ ë™ê¸°í™”)
 	VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 	VkSubmitInfo submitInfo{};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -385,7 +473,7 @@ void drawFrame()
 		throw std::runtime_error("Failed to submit draw command buffer");
 	}
 
-	//	ÇÁ·¹Á¨Å×ÀÌ¼Ç
+	//	í”„ë ˆì  í…Œì´ì…˜
 	VkPresentInfoKHR presentInfo{};
 	presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 	presentInfo.waitSemaphoreCount = 1;
@@ -396,9 +484,9 @@ void drawFrame()
 
 	result = vkQueuePresentKHR(g_Queue, &presentInfo);
 
-	// VK_ERROR_OUT_OF_DATE_KHR (À©µµ¿ì Å©±â º¯°æ µî) Ã³¸®
+	// VK_ERROR_OUT_OF_DATE_KHR (ìœˆë„ìš° í¬ê¸° ë³€ê²½ ë“±) ì²˜ë¦¬
 	if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
-		// swapchain recreate ÇÊ¿ä
+		// swapchain recreate í•„ìš”
 		// recreateSwapchain();
 	}
 	else if (result != VK_SUCCESS) {
@@ -412,7 +500,7 @@ int main()
 	{
 		initWindow();
 
-		// Vulkan ¸®¼Ò½º ¹× ImGui ÃÊ±âÈ­
+		// Vulkan ë¦¬ì†ŒìŠ¤ ë° ImGui ì´ˆê¸°í™”
 		initVulkan(window);
 		createSyncObjects();
 
@@ -433,13 +521,17 @@ int main()
 		);
 
 		InitImGui(window);
+
 		mainLoop();
+
+		CleanupSocket();
 		cleanupAll();
 		return 0;
 	}
 	catch(const std::exception& e)
 	{
-		std::cerr << "¿¹¿Ü ¹ß»ı : " << e.what() << std::endl;
+		std::cerr << "ì˜ˆì™¸ ë°œìƒ : " << e.what() << std::endl;
+		CleanupSocket();
 		return -1;
 	}
 }

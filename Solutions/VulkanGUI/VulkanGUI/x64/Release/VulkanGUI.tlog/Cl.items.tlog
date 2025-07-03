@@ -1,0 +1,16 @@
+F:\Vulkan\Solutions\VulkanGUI\ChatUI.cpp;F:\Vulkan\Solutions\VulkanGUI\VulkanGUI\x64\Release\ChatUI.obj
+F:\Vulkan\Solutions\VulkanGUI\CommandBuffer.cpp;F:\Vulkan\Solutions\VulkanGUI\VulkanGUI\x64\Release\CommandBuffer.obj
+F:\Vulkan\Solutions\VulkanGUI\Framebuffer.cpp;F:\Vulkan\Solutions\VulkanGUI\VulkanGUI\x64\Release\Framebuffer.obj
+F:\Vulkan\Solutions\VulkanGUI\GraphicsPipeline.cpp;F:\Vulkan\Solutions\VulkanGUI\VulkanGUI\x64\Release\GraphicsPipeline.obj
+F:\Vulkan\Solutions\VulkanGUI\main.cpp;F:\Vulkan\Solutions\VulkanGUI\VulkanGUI\x64\Release\main.obj
+F:\Vulkan\Solutions\VulkanGUI\RenderPass.cpp;F:\Vulkan\Solutions\VulkanGUI\VulkanGUI\x64\Release\RenderPass.obj
+F:\Vulkan\Solutions\VulkanGUI\Swapchain.cpp;F:\Vulkan\Solutions\VulkanGUI\VulkanGUI\x64\Release\Swapchain.obj
+F:\Vulkan\Solutions\VulkanGUI\thirdparty\imgui\backends\imgui_impl_glfw.cpp;F:\Vulkan\Solutions\VulkanGUI\VulkanGUI\x64\Release\imgui_impl_glfw.obj
+F:\Vulkan\Solutions\VulkanGUI\thirdparty\imgui\backends\imgui_impl_vulkan.cpp;F:\Vulkan\Solutions\VulkanGUI\VulkanGUI\x64\Release\imgui_impl_vulkan.obj
+F:\Vulkan\Solutions\VulkanGUI\thirdparty\imgui\imgui.cpp;F:\Vulkan\Solutions\VulkanGUI\VulkanGUI\x64\Release\imgui.obj
+F:\Vulkan\Solutions\VulkanGUI\thirdparty\imgui\imgui_demo.cpp;F:\Vulkan\Solutions\VulkanGUI\VulkanGUI\x64\Release\imgui_demo.obj
+F:\Vulkan\Solutions\VulkanGUI\thirdparty\imgui\imgui_draw.cpp;F:\Vulkan\Solutions\VulkanGUI\VulkanGUI\x64\Release\imgui_draw.obj
+F:\Vulkan\Solutions\VulkanGUI\thirdparty\imgui\imgui_tables.cpp;F:\Vulkan\Solutions\VulkanGUI\VulkanGUI\x64\Release\imgui_tables.obj
+F:\Vulkan\Solutions\VulkanGUI\thirdparty\imgui\imgui_widgets.cpp;F:\Vulkan\Solutions\VulkanGUI\VulkanGUI\x64\Release\imgui_widgets.obj
+F:\Vulkan\Solutions\VulkanGUI\thirdparty\imgui\misc\cpp\imgui_stdlib.cpp;F:\Vulkan\Solutions\VulkanGUI\VulkanGUI\x64\Release\imgui_stdlib.obj
+F:\Vulkan\Solutions\VulkanGUI\VulkanUtils.cpp;F:\Vulkan\Solutions\VulkanGUI\VulkanGUI\x64\Release\VulkanUtils.obj

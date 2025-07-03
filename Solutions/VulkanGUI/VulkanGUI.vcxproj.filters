@@ -57,6 +57,12 @@
     <ClCompile Include="CommandBuffer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="ChatUI.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdparty\imgui\misc\cpp\imgui_stdlib.cpp">
+      <Filter>리소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulkanUtils.h">
@@ -84,6 +90,9 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="CommandBuffer.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ChatUI.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

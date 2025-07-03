@@ -1,3 +1,4 @@
+F:\Vulkan\Solutions\VulkanGUI\ChatUI.cpp;F:\Vulkan\Solutions\VulkanGUI\VulkanGUI\x64\Debug\ChatUI.obj
 F:\Vulkan\Solutions\VulkanGUI\CommandBuffer.cpp;F:\Vulkan\Solutions\VulkanGUI\VulkanGUI\x64\Debug\CommandBuffer.obj
 F:\Vulkan\Solutions\VulkanGUI\Framebuffer.cpp;F:\Vulkan\Solutions\VulkanGUI\VulkanGUI\x64\Debug\Framebuffer.obj
 F:\Vulkan\Solutions\VulkanGUI\GraphicsPipeline.cpp;F:\Vulkan\Solutions\VulkanGUI\VulkanGUI\x64\Debug\GraphicsPipeline.obj
@@ -11,4 +12,5 @@ F:\Vulkan\Solutions\VulkanGUI\thirdparty\imgui\imgui_demo.cpp;F:\Vulkan\Solution
 F:\Vulkan\Solutions\VulkanGUI\thirdparty\imgui\imgui_draw.cpp;F:\Vulkan\Solutions\VulkanGUI\VulkanGUI\x64\Debug\imgui_draw.obj
 F:\Vulkan\Solutions\VulkanGUI\thirdparty\imgui\imgui_tables.cpp;F:\Vulkan\Solutions\VulkanGUI\VulkanGUI\x64\Debug\imgui_tables.obj
 F:\Vulkan\Solutions\VulkanGUI\thirdparty\imgui\imgui_widgets.cpp;F:\Vulkan\Solutions\VulkanGUI\VulkanGUI\x64\Debug\imgui_widgets.obj
+F:\Vulkan\Solutions\VulkanGUI\thirdparty\imgui\misc\cpp\imgui_stdlib.cpp;F:\Vulkan\Solutions\VulkanGUI\VulkanGUI\x64\Debug\imgui_stdlib.obj
 F:\Vulkan\Solutions\VulkanGUI\VulkanUtils.cpp;F:\Vulkan\Solutions\VulkanGUI\VulkanGUI\x64\Debug\VulkanUtils.obj

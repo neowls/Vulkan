@@ -1,4 +1,4 @@
-#define GLFW_INCLUDE_VULKAN
+ï»¿#define GLFW_INCLUDE_VULKAN
 #include <vulkan/vulkan.h>
 #include "VulkanUtils.h"
 #include <GLFW/glfw3.h>
@@ -150,7 +150,7 @@ void createLogicalDevice(VkPhysicalDevice physicalDevice)
 
 	if (vkCreateDevice(physicalDevice, &createInfo, nullptr, &device) != VK_SUCCESS)
 	{
-		throw std::runtime_error("³í¸® µğ¹ÙÀÌ½º »ı¼º ½ÇÆĞ");
+		throw std::runtime_error("ë…¼ë¦¬ ë””ë°”ì´ìŠ¤ ìƒì„± ì‹¤íŒ¨");
 	}
 
 	vkGetDeviceQueue(device, indices.graphicsFamily.value(), 0, &graphicsQueue);
@@ -182,7 +182,7 @@ void createImageView()
 
 		if (vkCreateImageView(device, &viewInfo, nullptr, &swapChainImageViews[i]) != VK_SUCCESS)
 		{
-			throw std::runtime_error("ÀÌ¹ÌÁö ºä »ı¼º ½ÇÆĞ");
+			throw std::runtime_error("ì´ë¯¸ì§€ ë·° ìƒì„± ì‹¤íŒ¨");
 		}
 	}
 }
@@ -334,7 +334,7 @@ std::vector<const char*> getRequiredExtensions()
 void framebufferResizeCallback(GLFWwindow* window, int width, int height)
 {
 	framebufferResized = true;
-	std::cerr << "ÇÁ·¹ÀÓ ¹öÆÛ Å©±â º¯°æ \n";
+	std::cerr << "í”„ë ˆì„ ë²„í¼ í¬ê¸° ë³€ê²½ \n";
 }
 
 
@@ -394,10 +394,10 @@ void createSwapChain()
 
 	if (vkCreateSwapchainKHR(device, &createInfo, nullptr, &swapChain) != VK_SUCCESS)
 	{
-		throw std::runtime_error("Swapchain »ı¼º ½ÇÆĞ");
+		throw std::runtime_error("Swapchain ìƒì„± ì‹¤íŒ¨");
 	}
 
-	// ÀÌ¹ÌÁö ¾ò±â
+	// ì´ë¯¸ì§€ ì–»ê¸°
 	vkGetSwapchainImagesKHR(device, swapChain, &imageCount, nullptr);
 	swapChainImages.resize(imageCount);
 	vkGetSwapchainImagesKHR(device, swapChain, &imageCount, swapChainImages.data());
@@ -437,7 +437,7 @@ void createRenderPass()
 	
 	if (vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS)
 	{
-		throw std::runtime_error("·»´õ ÆĞ½º »ı¼º ½ÇÆĞ");
+		throw std::runtime_error("ë Œë” íŒ¨ìŠ¤ ìƒì„± ì‹¤íŒ¨");
 	}
 }
 
@@ -460,7 +460,7 @@ void createFramebuffers()
 
 		if (vkCreateFramebuffer(device, &framebufferInfo, nullptr, &swapChainFramebuffers[i]) != VK_SUCCESS)
 		{
-			throw std::runtime_error("ÇÁ·¹ÀÓ¹öÆÛ »ı¼º ½ÇÆĞ");
+			throw std::runtime_error("í”„ë ˆì„ë²„í¼ ìƒì„± ì‹¤íŒ¨");
 		}
 	}
 }
@@ -551,7 +551,7 @@ void createGraphicsPipeline()
 
 	if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS)
 	{
-		throw std::runtime_error("ÆÄÀÌÇÁ¶óÀÎ ·¹ÀÌ¾Æ¿ô »ı¼º ½ÇÆĞ");
+		throw std::runtime_error("íŒŒì´í”„ë¼ì¸ ë ˆì´ì•„ì›ƒ ìƒì„± ì‹¤íŒ¨");
 	}
 
 	VkGraphicsPipelineCreateInfo pipelineInfo{};
@@ -571,7 +571,7 @@ void createGraphicsPipeline()
 
 	if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS)
 	{
-		throw std::runtime_error("±×·¡ÇÈ ÆÄÀÌÇÁ¶óÀÎ »ı¼º ½ÇÆĞ");
+		throw std::runtime_error("ê·¸ë˜í”½ íŒŒì´í”„ë¼ì¸ ìƒì„± ì‹¤íŒ¨");
 	}
 
 	vkDestroyShaderModule(device, fragShaderModule, nullptr);
@@ -588,7 +588,7 @@ void createCommandPool()
 
 	if (vkCreateCommandPool(device, &poolInfo, nullptr, &commandPool) != VK_SUCCESS) 
 	{
-		throw std::runtime_error("Ä¿¸Çµå Ç® »ı¼º ½ÇÆĞ");
+		throw std::runtime_error("ì»¤ë§¨ë“œ í’€ ìƒì„± ì‹¤íŒ¨");
 	}
 }
 
@@ -604,7 +604,7 @@ void createCommandBuffers()
 
 	if (vkAllocateCommandBuffers(device, &alloInfo, commandBuffers.data()) != VK_SUCCESS)
 	{
-		throw std::runtime_error("Ä¿¸Çµå ¹öÆÛ ÇÒ´ç ½ÇÆĞ");
+		throw std::runtime_error("ì»¤ë§¨ë“œ ë²„í¼ í• ë‹¹ ì‹¤íŒ¨");
 	}
 
 	for (size_t i = 0; i < commandBuffers.size(); i++)
@@ -614,7 +614,7 @@ void createCommandBuffers()
 
 		if (vkBeginCommandBuffer(commandBuffers[i], &beginInfo) != VK_SUCCESS)
 		{
-			throw std::runtime_error("Ä¿¸Çµå ¹öÆÛ ½ÃÀÛ ½ÇÆĞ");
+			throw std::runtime_error("ì»¤ë§¨ë“œ ë²„í¼ ì‹œì‘ ì‹¤íŒ¨");
 		}
 
 		VkRenderPassBeginInfo renderPassInfo{};
@@ -652,7 +652,7 @@ void createCommandBuffers()
 
 		if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS)
 		{
-			throw std::runtime_error("Ä¿¸Çµå ¹öÆÛ ±â·Ï ½ÇÆĞ");
+			throw std::runtime_error("ì»¤ë§¨ë“œ ë²„í¼ ê¸°ë¡ ì‹¤íŒ¨");
 		}
 	}
 }
@@ -670,7 +670,7 @@ void createSyncObjects()
 		vkCreateSemaphore(device, &semaphoreInfo, nullptr, &renderFinishedSemaphore) != VK_SUCCESS ||
 		vkCreateFence(device, &fenceInfo, nullptr, &inFlightFence) != VK_SUCCESS)
 	{
-		throw std::runtime_error("µ¿±âÈ­ °´Ã¼ »ı¼º ½ÇÆĞ");
+		throw std::runtime_error("ë™ê¸°í™” ê°ì²´ ìƒì„± ì‹¤íŒ¨");
 	}
 }
 
@@ -678,29 +678,29 @@ void createSyncObjects()
 
 void cleanUpSwapChain()
 {
-	// ¸í·É ¹öÆÛ ÇØÁ¦
+	// ëª…ë ¹ ë²„í¼ í•´ì œ
 	vkFreeCommandBuffers(device, commandPool, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
 
-	// ÇÁ·¹ÀÓ¹öÆÛ ÇØÁ¦
+	// í”„ë ˆì„ë²„í¼ í•´ì œ
 	for (auto framebuffer : swapChainFramebuffers)
 	{
 		vkDestroyFramebuffer(device, framebuffer, nullptr);
 	}
 
-	// ÀÌ¹ÌÁö ºä ÇØÁ¦
+	// ì´ë¯¸ì§€ ë·° í•´ì œ
 	for (auto imageView : swapChainImageViews)
 	{
 		vkDestroyImageView(device, imageView, nullptr);
 	}
 
-	// ½º¿ÒÃ¼ÀÎ ÇØÁ¦
+	// ìŠ¤ì™‘ì²´ì¸ í•´ì œ
 	vkDestroySwapchainKHR(device, swapChain, nullptr);
 }
 
 void recreateSwapChain()
 {
-	std::cerr << "½º¿ÒÃ¼ÀÎ Àç»ı¼º ½ÃÀÛ\n";
-	// Ã¢ÀÌ ÃÖ¼ÒÈ­ µÇ¾úÀ» °æ¿ì ÀÌº¥Æ® ´ë±â
+	std::cerr << "ìŠ¤ì™‘ì²´ì¸ ì¬ìƒì„± ì‹œì‘\n";
+	// ì°½ì´ ìµœì†Œí™” ë˜ì—ˆì„ ê²½ìš° ì´ë²¤íŠ¸ ëŒ€ê¸°
 	int width = 0, height = 0;
 	glfwGetFramebufferSize(window, &width, &height);
 
@@ -710,20 +710,20 @@ void recreateSwapChain()
 		return;
 	}
 
-	// GPU°¡ ¸ğµç ¸í·ÉÀ» ³¡³¾ ¶§±îÁö ´ë±â
+	// GPUê°€ ëª¨ë“  ëª…ë ¹ì„ ëë‚¼ ë•Œê¹Œì§€ ëŒ€ê¸°
 	vkDeviceWaitIdle(device);
 
-	// ±âÁ¸ ½º¿ÒÃ¼ÀÎ Á¤¸®
+	// ê¸°ì¡´ ìŠ¤ì™‘ì²´ì¸ ì •ë¦¬
 	cleanUpSwapChain();
 
-	// »õ ½º¿ÒÃ¼ÀÎ ¹× °ü·Ã °´Ã¼ »ı¼º
+	// ìƒˆ ìŠ¤ì™‘ì²´ì¸ ë° ê´€ë ¨ ê°ì²´ ìƒì„±
 	createSwapChain();
 	createImageView();
 	createFramebuffers();
 	createCommandBuffers();
 
 	framebufferResized = false;
-	std::cerr << "½º¿ÒÃ¼ÀÎ Àç»ı¼º ³¡\n";
+	std::cerr << "ìŠ¤ì™‘ì²´ì¸ ì¬ìƒì„± ë\n";
 }
 
 bool isDeviceSuitable(VkPhysicalDevice device)
@@ -748,7 +748,7 @@ void pickPhysicalDevice()
 
 	if (deviceCount == 0)
 	{
-		throw std::runtime_error("Vulkan À» Áö¿øÇÏ´Â GPU¸¦ Ã£À» ¼ö ¾ø½À´Ï´Ù.");
+		throw std::runtime_error("Vulkan ì„ ì§€ì›í•˜ëŠ” GPUë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
 	}
 
 	std::vector<VkPhysicalDevice> devices(deviceCount);
@@ -765,7 +765,7 @@ void pickPhysicalDevice()
 
 	if (physicalDevice == VK_NULL_HANDLE)
 	{
-		throw std::runtime_error("ÀûÀıÇÑ GPU¸¦ Ã£À» ¼ö ¾ø½À´Ï´Ù.");
+		throw std::runtime_error("ì ì ˆí•œ GPUë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
 	}
 
 	createLogicalDevice(physicalDevice);
@@ -787,7 +787,7 @@ void drawFrame()
 	}
 	else if (result != VK_SUCCESS)
 	{
-		throw std::runtime_error("ÀÌ¹ÌÁö È¹µæ ½ÇÆĞ");
+		throw std::runtime_error("ì´ë¯¸ì§€ íšë“ ì‹¤íŒ¨");
 	}
 
 	vkResetFences(device, 1, &inFlightFence);
@@ -810,7 +810,7 @@ void drawFrame()
 
 	if (vkQueueSubmit(graphicsQueue, 1, &submitInfo, inFlightFence) != VK_SUCCESS)
 	{
-		throw std::runtime_error("Ä¿¸Çµå Á¦Ãâ ½ÇÆĞ");
+		throw std::runtime_error("ì»¤ë§¨ë“œ ì œì¶œ ì‹¤íŒ¨");
 	}
 
 	VkPresentInfoKHR presentInfo{};
@@ -830,7 +830,7 @@ void drawFrame()
 	}
 	else if (result != VK_SUCCESS)
 	{
-		throw std::runtime_error("ÇÁ·¹Á¨Æ® ½ÇÆĞ");
+		throw std::runtime_error("í”„ë ˆì  íŠ¸ ì‹¤íŒ¨");
 	}
 }
 
@@ -851,7 +851,7 @@ void setupDebugMessenger()
 
 	if (CreateDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &debugMessenger) != VK_SUCCESS)
 	{
-		throw std::runtime_error("µğ¹ö±× ¸Ş½ÅÀú »ı¼º ½ÇÆĞ");
+		throw std::runtime_error("ë””ë²„ê·¸ ë©”ì‹ ì € ìƒì„± ì‹¤íŒ¨");
 	}
 }
 
@@ -859,7 +859,7 @@ void initVulkan()
 {
 	if (enableValidationLayers && !checkValidationLayerSupport())
 	{
-		throw std::runtime_error("À¯È¿¼º ·¹ÀÌ¾î¸¦ Áö¿øÇÏÁö ¾ÊÀ½");
+		throw std::runtime_error("ìœ íš¨ì„± ë ˆì´ì–´ë¥¼ ì§€ì›í•˜ì§€ ì•ŠìŒ");
 	}
 
 	VkApplicationInfo appInfo{};
@@ -896,7 +896,7 @@ void initVulkan()
 
 	if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS)
 	{
-		throw std::runtime_error("Vulkan ÀÎ½ºÅÏ½º »ı¼º ½ÇÆĞ");
+		throw std::runtime_error("Vulkan ì¸ìŠ¤í„´ìŠ¤ ìƒì„± ì‹¤íŒ¨");
 	}
 
 	setupDebugMessenger();
@@ -955,7 +955,7 @@ int main()
 	}
 	catch(const std::exception& e)
 	{
-		std::cerr << "¿¡·¯ ¹ß»ı : " << e.what() << std::endl;
+		std::cerr << "ì—ëŸ¬ ë°œìƒ : " << e.what() << std::endl;
 		return EXIT_FAILURE;
 	}
 

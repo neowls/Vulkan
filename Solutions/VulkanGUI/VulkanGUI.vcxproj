@@ -103,7 +103,7 @@
       <PreprocessorDefinitions>IMGUI_IMPL_VULKAN_NO_PROTOTYPES</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.4.313.1\Include;C:\vcpkg-master\installed\x64-windows\include;thirdparty/imgui/;thirdparty/imgui/backends/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\VulkanSDK\1.4.313.1\Include;C:\vcpkg-master\installed\x64-windows\include;thirdparty/imgui/;thirdparty/imgui/backends/;thirdparty/imgui/misc/cpp</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -121,7 +121,7 @@
       <PreprocessorDefinitions>IMGUI_IMPL_VULKAN_NO_PROTOTYPES</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.4.313.1\Include;C:\vcpkg-master\installed\x64-windows\include;thirdparty/imgui/;thirdparty/imgui/backends/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\VulkanSDK\1.4.313.1\Include;C:\vcpkg-master\installed\x64-windows\include;thirdparty/imgui/;thirdparty/imgui/backends/;thirdparty/imgui/misc/cpp</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -131,6 +131,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ChatUI.cpp" />
     <ClCompile Include="CommandBuffer.cpp" />
     <ClCompile Include="Framebuffer.cpp" />
     <ClCompile Include="GraphicsPipeline.cpp" />
@@ -144,9 +145,11 @@
     <ClCompile Include="thirdparty\imgui\imgui_draw.cpp" />
     <ClCompile Include="thirdparty\imgui\imgui_tables.cpp" />
     <ClCompile Include="thirdparty\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="thirdparty\imgui\misc\cpp\imgui_stdlib.cpp" />
     <ClCompile Include="VulkanUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ChatUI.h" />
     <ClInclude Include="CommandBuffer.h" />
     <ClInclude Include="Framebuffer.h" />
     <ClInclude Include="GraphicsPipeline.h" />

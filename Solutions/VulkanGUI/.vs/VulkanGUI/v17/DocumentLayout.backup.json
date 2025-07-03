@@ -5,6 +5,18 @@
     {
       "AbsoluteMoniker": "D:0:0:{3916EA37-654A-4A1F-BEE5-E3AEAD5CF534}|VulkanGUI.vcxproj|F:\\Vulkan\\Solutions\\VulkanGUI\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{3916EA37-654A-4A1F-BEE5-E3AEAD5CF534}|VulkanGUI.vcxproj|solutionrelative:main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3916EA37-654A-4A1F-BEE5-E3AEAD5CF534}|VulkanGUI.vcxproj|F:\\Vulkan\\Solutions\\VulkanGUI\\ChatUI.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{3916EA37-654A-4A1F-BEE5-E3AEAD5CF534}|VulkanGUI.vcxproj|solutionrelative:ChatUI.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3916EA37-654A-4A1F-BEE5-E3AEAD5CF534}|VulkanGUI.vcxproj|F:\\Vulkan\\Solutions\\VulkanGUI\\ChatUI.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{3916EA37-654A-4A1F-BEE5-E3AEAD5CF534}|VulkanGUI.vcxproj|solutionrelative:ChatUI.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3916EA37-654A-4A1F-BEE5-E3AEAD5CF534}|VulkanGUI.vcxproj|F:\\Vulkan\\Solutions\\VulkanGUI\\thirdparty\\imgui\\backends\\imgui_impl_vulkan.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{3916EA37-654A-4A1F-BEE5-E3AEAD5CF534}|VulkanGUI.vcxproj|solutionrelative:thirdparty\\imgui\\backends\\imgui_impl_vulkan.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
   "DocumentGroupContainers": [
@@ -22,11 +34,50 @@
               "Title": "main.cpp",
               "DocumentMoniker": "F:\\Vulkan\\Solutions\\VulkanGUI\\main.cpp",
               "RelativeDocumentMoniker": "main.cpp",
-              "ToolTip": "F:\\Vulkan\\Solutions\\VulkanGUI\\main.cpp*",
-              "RelativeToolTip": "main.cpp*",
-              "ViewState": "AgIAANsAAAAAAAAAAADwv/UAAAARAAAAAAAAAA==",
+              "ToolTip": "F:\\Vulkan\\Solutions\\VulkanGUI\\main.cpp",
+              "RelativeToolTip": "main.cpp",
+              "ViewState": "AgIAAPkBAAAAAAAAAADwvxgCAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2025-06-29T11:31:40.322Z",
+              "WhenOpened": "2025-07-03T07:15:24.114Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ChatUI.h",
+              "DocumentMoniker": "F:\\Vulkan\\Solutions\\VulkanGUI\\ChatUI.h",
+              "RelativeDocumentMoniker": "ChatUI.h",
+              "ToolTip": "F:\\Vulkan\\Solutions\\VulkanGUI\\ChatUI.h",
+              "RelativeToolTip": "ChatUI.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABsAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-07-03T07:14:08.948Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ChatUI.cpp",
+              "DocumentMoniker": "F:\\Vulkan\\Solutions\\VulkanGUI\\ChatUI.cpp",
+              "RelativeDocumentMoniker": "ChatUI.cpp",
+              "ToolTip": "F:\\Vulkan\\Solutions\\VulkanGUI\\ChatUI.cpp",
+              "RelativeToolTip": "ChatUI.cpp",
+              "ViewState": "AgIAAE4AAAAAAAAAAAAAABAAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-07-03T07:13:40.225Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "imgui_impl_vulkan.h",
+              "DocumentMoniker": "F:\\Vulkan\\Solutions\\VulkanGUI\\thirdparty\\imgui\\backends\\imgui_impl_vulkan.h",
+              "RelativeDocumentMoniker": "thirdparty\\imgui\\backends\\imgui_impl_vulkan.h",
+              "ToolTip": "F:\\Vulkan\\Solutions\\VulkanGUI\\thirdparty\\imgui\\backends\\imgui_impl_vulkan.h",
+              "RelativeToolTip": "thirdparty\\imgui\\backends\\imgui_impl_vulkan.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-07-03T07:10:46.835Z",
               "EditorCaption": ""
             }
           ]
