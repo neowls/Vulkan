@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "F:\\Vulkan\\Solutions\\VulkanGUI\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{3916EA37-654A-4A1F-BEE5-E3AEAD5CF534}|VulkanGUI.vcxproj|F:\\Vulkan\\Solutions\\VulkanGUI\\ChatUI.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{3916EA37-654A-4A1F-BEE5-E3AEAD5CF534}|VulkanGUI.vcxproj|solutionrelative:ChatUI.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{3916EA37-654A-4A1F-BEE5-E3AEAD5CF534}|VulkanGUI.vcxproj|F:\\Vulkan\\Solutions\\VulkanGUI\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{3916EA37-654A-4A1F-BEE5-E3AEAD5CF534}|VulkanGUI.vcxproj|solutionrelative:main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3916EA37-654A-4A1F-BEE5-E3AEAD5CF534}|VulkanGUI.vcxproj|F:\\Vulkan\\Solutions\\VulkanGUI\\ChatUI.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{3916EA37-654A-4A1F-BEE5-E3AEAD5CF534}|VulkanGUI.vcxproj|solutionrelative:ChatUI.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{3916EA37-654A-4A1F-BEE5-E3AEAD5CF534}|VulkanGUI.vcxproj|F:\\Vulkan\\Solutions\\VulkanGUI\\ChatUI.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
@@ -22,7 +22,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Document",
@@ -30,8 +30,8 @@
               "Title": "ChatUI.h",
               "DocumentMoniker": "F:\\Vulkan\\Solutions\\VulkanGUI\\ChatUI.h",
               "RelativeDocumentMoniker": "ChatUI.h",
-              "ToolTip": "F:\\Vulkan\\Solutions\\VulkanGUI\\ChatUI.h*",
-              "RelativeToolTip": "ChatUI.h*",
+              "ToolTip": "F:\\Vulkan\\Solutions\\VulkanGUI\\ChatUI.h",
+              "RelativeToolTip": "ChatUI.h",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAAATAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
               "WhenOpened": "2025-07-09T02:46:44.349Z",
@@ -39,26 +39,26 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "ChatUI.cpp",
               "DocumentMoniker": "F:\\Vulkan\\Solutions\\VulkanGUI\\ChatUI.cpp",
               "RelativeDocumentMoniker": "ChatUI.cpp",
               "ToolTip": "F:\\Vulkan\\Solutions\\VulkanGUI\\ChatUI.cpp",
               "RelativeToolTip": "ChatUI.cpp",
-              "ViewState": "AgIAAFIAAAAAAAAAAAAAAGIAAAAdAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2025-07-07T00:42:45.889Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "main.cpp",
               "DocumentMoniker": "F:\\Vulkan\\Solutions\\VulkanGUI\\main.cpp",
               "RelativeDocumentMoniker": "main.cpp",
               "ToolTip": "F:\\Vulkan\\Solutions\\VulkanGUI\\main.cpp",
               "RelativeToolTip": "main.cpp",
-              "ViewState": "AgIAAIoAAAAAAAAAAAAAAJgAAAAEAAAAAAAAAA==",
+              "ViewState": "AgIAALEAAAAAAAAAAAAAALcAAAAZAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2025-07-06T09:58:31.787Z",
               "EditorCaption": ""

@@ -14,7 +14,6 @@
 # Compiled Dynamic libraries
 *.so
 *.dylib
-*.dll
 
 # Fortran module files
 *.mod
@@ -27,7 +26,6 @@
 *.lib
 
 # Executables
-*.exe
 *.out
 *.app
 *.vsidx
@@ -39,3 +37,13 @@
 *.db
 *.db
 *.db
+Solutions/VulkanGUI/.vs/VulkanGUI/v17/DocumentLayout.json
+Solutions/VulkanGUI/.vs/VulkanGUI/v17/DocumentLayout.backup.json
+Solutions/VulkanGUI/.vs/VulkanGUI/v17/Browse.VC.db
+Solutions/VulkanGUI/.vs/VulkanGUI/v17/.suo
+Solutions/VulkanGUI/VulkanGUI/x64/Release/VulkanGUI.iobj
+Solutions/VulkanGUI/VulkanGUI/x64/Release/VulkanGUI.log
+Solutions/helloworld/out/build/x64-debug/CMakeFiles/3.31.6-msvc6/CompilerIdC/CompilerIdC.exe
+Solutions/helloworld/out/build/x64-debug/CMakeFiles/3.31.6-msvc6/CompilerIdCXX/CompilerIdCXX.exe
+Solutions/helloworld/build/CMakeFiles/3.31.6-msvc6/CompilerIdCXX/CompilerIdCXX.exe
+Solutions/helloworld/build/CMakeFiles/3.31.6-msvc6/CompilerIdC/CompilerIdC.exe
