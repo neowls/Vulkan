@@ -5,7 +5,7 @@
 
 namespace VulkanUtils 
 {
-    // Vulkan ¸®¼Ò½º ÇÚµé
+    // Vulkan ë¦¬ì†ŒìŠ¤ í•¸ë“¤
     extern VkAllocationCallbacks*    g_Allocator;
     extern VkInstance                g_Instance;
     extern uint32_t                  g_QueueFamily;

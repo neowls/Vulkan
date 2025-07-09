@@ -18,7 +18,7 @@ namespace CommandBuffer
 
 		if (vkAllocateCommandBuffers(device, &allocInfo, commandBuffers.data()) != VK_SUCCESS)
 		{
-			throw std::runtime_error("Ä¿¸Çµå ¹öÆÛ ÇÒ´ç ½ÇÆĞ.\n");
+			throw std::runtime_error("ì»¤ë§¨ë“œ ë²„í¼ í• ë‹¹ ì‹¤íŒ¨.\n");
 		}
 	}
 
@@ -31,7 +31,7 @@ namespace CommandBuffer
 
 			if (vkBeginCommandBuffer(commandBuffers[i], &beginInfo) != VK_SUCCESS)
 			{
-				throw std::runtime_error("Ä¿¸Çµå ¹öÆÛ ±â·Ï ½ÃÀÛ ½ÇÆĞ.\n");
+				throw std::runtime_error("ì»¤ë§¨ë“œ ë²„í¼ ê¸°ë¡ ì‹œì‘ ì‹¤íŒ¨.\n");
 			}
 
 			VkRenderPassBeginInfo renderPassInfo{};
@@ -51,7 +51,7 @@ namespace CommandBuffer
 
 			if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS)
 			{
-				throw std::runtime_error("Ä¿¸Çµå ¹öÆÛ ±â·Ï Á¾·á ½ÇÆĞ.\n");
+				throw std::runtime_error("ì»¤ë§¨ë“œ ë²„í¼ ê¸°ë¡ ì¢…ë£Œ ì‹¤íŒ¨.\n");
 			}
 		}
 	}

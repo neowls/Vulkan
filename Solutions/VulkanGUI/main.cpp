@@ -1,4 +1,4 @@
-﻿#include <vulkan/vulkan.h>
+#include <vulkan/vulkan.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <vector>
@@ -6,8 +6,11 @@
 #include <ws2tcpip.h>
 #include <thread>
 #include <atomic>
+#include <sstream>
 #include <string>
 #include <mutex>
+#include <map>
+#include <random>
 #include <exception>
 #include "VulkanUtils.h"
 #include "Swapchain.h"
@@ -30,7 +33,16 @@ using namespace VulkanUtils;
 #ifdef _DEBUG
 #define APP_USE_VULKAN_DEBUG_REPORT
 static VkDebugReportCallbackEXT g_DebugReport = VK_NULL_HANDLE;
+
 #endif
+
+struct ClientInfo
+{
+	SOCKET socket;
+	std::string uuid;
+	std::string nickname;
+};
+
 
 GLFWwindow* window = VK_NULL_HANDLE;
 VkSurfaceKHR g_Surface = VK_NULL_HANDLE;
@@ -41,52 +53,208 @@ VkSemaphore renderFinishedSemaphore;
 VkFence inFlightFence;
 
 static ImGui_ImplVulkanH_Window  g_MainWindowData;
+static std::thread serverThread;
+static bool serverRunning = false;
 
 std::vector<std::string> chatMessages;
+std::map<SOCKET, ClientInfo> clients;
 std::mutex chatMutex;
 std::atomic<bool> running(true);
 
 SOCKET sock = INVALID_SOCKET;
 
-ChatUI::Callbacks chatCallbacks
-{
-	//	방 생성
-	[](const std::string& nickname)
-	{
-	},
-	//	방 참가
-	[](const std::string& nickname, const std::string& ip)
-	{
-	},
-	//	메세지 전송
-	[](const std::string& message)
-	{
-		chatMessages.push_back(ChatUI::nickname + " : " + message);
-	}
-};
 
 void initWindow();
 void mainLoop();
 void cleanupAll();
 void drawFrame();
 
-void SocketReceiveThread(SOCKET sock) 
+std::string GenerateRandomUUID()
+{
+	static std::mt19937_64 rng(std::random_device{}());
+	static std::uniform_int_distribution<uint64_t> dist;
+
+	std::stringstream ss;
+	ss << std::hex;
+	for (int i = 0; i < 2; ++i)
+	{
+		ss.width(8);
+		ss.fill('0');
+		ss << dist(rng);
+	}
+	return ss.str();
+}
+
+// 모든 클라이언트에게 메세지 브로드캐스트
+void BroadcastMessage(const std::string& msg) 
+{
+	std::lock_guard<std::mutex> lock(chatMutex);
+	for (const auto& [sock, info] : clients)
+	{
+		send(sock, msg.c_str(), (int)msg.size(), 0);
+	}
+}
+
+//	서버 - 클라이언트 스레드
+void Handle_Client(SOCKET client_sock)
+{
+	char buf[1024] = {0};
+	//	닉네임 수신
+	int n = recv(client_sock, buf, sizeof(buf) - 1, 0);
+	if (n <= 0)
+	{
+		closesocket(client_sock);
+		return;
+	}
+
+	buf[n] = 0;
+
+	//	클라이언트 등록
+	std::string nickname(buf);
+	{
+		std::lock_guard<std::mutex> lock(chatMutex);
+		clients[client_sock] = { client_sock, GenerateRandomUUID(), nickname };
+	}
+
+	//	입장 메세지 브로드캐스트
+	BroadcastMessage("[시스템] " + std::string(nickname) + "님이 입장하였습니다.");
+
+
+	//	메세지 루프
+	while (true)
+	{
+		n = recv(client_sock, buf, sizeof(buf) - 1, 0);
+		if (n <= 0) break;
+		buf[n] = 0;
+		std::string text(buf);
+
+		BroadcastMessage("[" + nickname + "] " + text);
+	}
+	
+	//	연결 해제
+	{
+		std::lock_guard<std::mutex> lock(chatMutex);
+		clients.erase(client_sock);
+	}
+	closesocket(client_sock);
+
+	BroadcastMessage("[시스템] " + nickname + " 님이 퇴장하였습니다.");
+}
+
+void SocketReceiveThread(SOCKET sock)
 {
 	char buf[1024];
-	while (running) 
+	while (running)
 	{
 		int n = recv(sock, buf, sizeof(buf) - 1, 0);
-		if (n > 0) 
+		if (n > 0)
 		{
 			buf[n] = 0;
-			std::lock_guard<std::mutex> lock(chatMutex);
-			chatMessages.emplace_back(buf);
+			{
+				std::lock_guard<std::mutex> lock(chatMutex);
+				chatMessages.emplace_back(buf);
+			}
 		}
-		else 
+		else
 		{
+			ChatUI::ToLobby();
 			running = false;
 			break;
 		}
+	}
+}
+
+//	서버 스레드
+void ChatServerThread()
+{
+	//	서버용 변수 선언
+	WSADATA wsaData;
+	SOCKET server_sock = INVALID_SOCKET;
+
+	//	Winsock 초기화
+	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
+	{
+		std::lock_guard<std::mutex> lock(chatMutex);
+		chatMessages.emplace_back(u8"[서버] WSAStartup 실패.");
+		return;
+	}
+
+	//	소켓 생성
+	server_sock = socket(AF_INET, SOCK_STREAM, 0);
+	if (server_sock == INVALID_SOCKET)
+	{
+		std::lock_guard<std::mutex> lock(chatMutex);
+		chatMessages.emplace_back(u8"[서버] 소켓 생성 실패.");
+		WSACleanup();
+		return;
+	}
+
+	//	바인딩
+	sockaddr_in serv_addr = {};
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_addr.s_addr = INADDR_ANY;
+	serv_addr.sin_port = htons(8888);
+
+	if (bind(server_sock, (SOCKADDR*)&serv_addr, sizeof(serv_addr)) == SOCKET_ERROR)
+	{
+		std::lock_guard<std::mutex> lock(chatMutex);
+		chatMessages.emplace_back(u8"[서버] 바인드 실패.(이미 사용중인 포트)");
+		closesocket(server_sock);
+		WSACleanup();
+		return;
+	}
+
+	//	리슨
+	if (listen(server_sock, 5) == SOCKET_ERROR)
+	{
+		std::lock_guard<std::mutex> lock(chatMutex);
+		chatMessages.emplace_back(u8"[서버] 리슨 실패.");
+		closesocket(server_sock);
+		WSACleanup();
+		return;
+	}
+
+	{
+		std::lock_guard<std::mutex> lock(chatMutex);
+		chatMessages.emplace_back("[서버] 채팅 서버 시작. 포트 8888");
+	}
+
+	//	연결 수락 및 데이터 처리 루프
+	while (running)
+	{
+		fd_set readfds;
+		FD_ZERO(&readfds);
+		FD_SET(server_sock, &readfds);
+
+		timeval timeout = { 0, 200 * 1000 }; // 200ms
+		int ready = select(0, &readfds, NULL, NULL, &timeout);
+
+		if (!running) break;
+		if (ready > 0 && FD_ISSET(server_sock, &readfds))
+		{
+			SOCKET client_sock = accept(server_sock, NULL, NULL);
+			if (client_sock != INVALID_SOCKET)
+			{
+				{
+					std::thread(Handle_Client, client_sock).detach();
+				}
+			}
+		}
+	}
+
+	// 클라이언트간 연결 종료
+	for (const auto& client : clients)
+	{
+		closesocket(client.first);
+	}
+
+	// 서버 종료
+	closesocket(server_sock);
+
+	WSACleanup();
+	{
+		std::lock_guard<std::mutex> lock(chatMutex);
+		chatMessages.emplace_back("[서버] 채팅 서버 종료.");
 	}
 }
 
@@ -108,10 +276,9 @@ bool ConnectToServer(const char* server_ip, const char* nickname)
 	if (connect(sock, (SOCKADDR*)&serv_addr, sizeof(serv_addr)) == SOCKET_ERROR)
 		return false;
 
-	// 토큰 없이 단일 클라이언트 테스트 시
-	std::string login_msg = "dummy INPUT ";
+	// 로그인 메세지 전송
+	std::string login_msg = u8"";
 	login_msg += nickname;
-	login_msg += "\n";
 	send(sock, login_msg.c_str(), (int)login_msg.size(), 0);
 
 	return true;
@@ -124,7 +291,59 @@ void CleanupSocket()
 	WSACleanup();
 }
 
+ChatUI::Callbacks chatCallbacks
+{
+	//	방 생성
+	[](const std::string& nickname)
+	{
+		if (!serverRunning)
+		{
+			serverThread = std::thread(ChatServerThread);
+			serverThread.detach();
+			serverRunning = true;
+			std::this_thread::sleep_for(std::chrono::milliseconds(200));
+		}
 
+		// 자신의 서버의 접속
+		if (!ConnectToServer("127.0.0.1", nickname.c_str()))
+		{
+			std::lock_guard<std::mutex> lock(chatMutex);
+			chatMessages.emplace_back("[시스템] 서버 연결 실패.");
+		}
+		else
+		{
+			std::lock_guard<std::mutex> lock(chatMutex);
+			chatMessages.emplace_back("[시스템] 방을 생성했습니다.");
+			std::thread(SocketReceiveThread, sock).detach();
+		}
+	},
+	//	방 참가
+	[](const std::string& nickname, const std::string& ip)
+	{
+		if (!ConnectToServer(ip.c_str(), nickname.c_str()))
+		{
+			std::lock_guard<std::mutex> lock(chatMutex);
+			chatMessages.emplace_back("[시스템] 서버 연결 실패.");
+		}
+		else
+		{
+			std::lock_guard<std::mutex> lock(chatMutex);
+			chatMessages.emplace_back("[시스템] 방에 참가했습니다.");
+			std::thread(SocketReceiveThread, sock).detach();
+		}
+	},
+	//	메세지 전송
+	[](const std::string& message)
+	{
+		if (sock != INVALID_SOCKET)
+		{
+			send(sock, message.c_str(), static_cast<int>(message.size()), 0);
+		}
+		// 채팅창에 바로 표시 (Echo)
+		//std::lock_guard<std::mutex> lock(chatMutex);
+		//chatMessages.push_back(ChatUI::nickname + " : " + message);
+	}
+};
 
 static void SetupVulkanWindow(ImGui_ImplVulkanH_Window* wd, VkSurfaceKHR surface, int width, int height)
 {

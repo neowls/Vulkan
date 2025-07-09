@@ -10,20 +10,20 @@ namespace ChatUI
 	std::string serverIP = "127.0.0.1";
 	std::string inputMessage;
 
-	//	ÀÔ·Â Æ÷Ä¿½º Á¦¾î
+	//	ì…ë ¥ í¬ì»¤ìŠ¤ ì œì–´
 	static bool focusInput = false;
 
     void RenderLobby(Callbacks& cb) 
     {
         ImGui::SetNextWindowSize(ImVec2(600, 500), ImGuiCond_FirstUseEver);
-        ImGui::Begin(u8"Ã¤ÆÃ ·Îºñ");
+        ImGui::Begin("ì±„íŒ… ë¡œë¹„");
 
-        ImGui::Text(u8"´Ğ³×ÀÓ");
+        ImGui::Text("ë‹‰ë„¤ì„");
         ImGui::SameLine();
         ImGui::InputText("##nickname", &nickname);
 
-        // ¹æ ¸¸µé±â
-        if (ImGui::Button(u8"¹æ ¸¸µé±â"))
+        // ë°© ë§Œë“¤ê¸°
+        if (ImGui::Button("ë°© ë§Œë“¤ê¸°"))
         {
             if (!nickname.empty() && cb.onHost)
                 cb.onHost(nickname);
@@ -31,16 +31,16 @@ namespace ChatUI
         }
         ImGui::SameLine();
 
-        // Âü°¡
-        if (ImGui::Button(u8"Âü°¡ÇÏ±â")) 
+        // ì°¸ê°€
+        if (ImGui::Button("ì°¸ê°€í•˜ê¸°")) 
         {
             ImGui::OpenPopup("JoinPopup");
         }
 
         if (ImGui::BeginPopup("JoinPopup")) 
         {
-            ImGui::InputText(u8"¼­¹ö IP", &serverIP);
-            if (ImGui::Button(u8"Á¢¼Ó")) 
+            ImGui::InputText("ì„œë²„ IP", &serverIP);
+            if (ImGui::Button("ì ‘ì†")) 
             {
                 if (!nickname.empty() && cb.onJoin)
                     cb.onJoin(nickname, serverIP);
@@ -48,7 +48,7 @@ namespace ChatUI
                 ImGui::CloseCurrentPopup();
             }
             ImGui::SameLine();
-            if (ImGui::Button(u8"Ãë¼Ò")) 
+            if (ImGui::Button(u8"ì·¨ì†Œ")) 
             {
                 ImGui::CloseCurrentPopup();
             }
@@ -59,9 +59,9 @@ namespace ChatUI
 
     void RenderChat(const std::vector<std::string>& chatMessages, Callbacks& cb) 
     {
-        ImGui::Begin(u8"Ã¤ÆÃ");
+        ImGui::Begin("ì±„íŒ…");
 
-        // ¸Ş½ÃÁö ¸®½ºÆ®
+        // ë©”ì‹œì§€ ë¦¬ìŠ¤íŠ¸
         ImGui::BeginChild("ChatHistory", ImVec2(0, 300), true);
         for (const auto& msg : chatMessages)
             ImGui::TextUnformatted(msg.c_str());
@@ -71,7 +71,7 @@ namespace ChatUI
 
         ImGui::Separator();
 
-        // ÀÔ·Â
+        // ì…ë ¥
         ImGui::PushItemWidth(-80);
         if (focusInput) 
         {
@@ -80,7 +80,7 @@ namespace ChatUI
         }
         bool enterPressed = ImGui::InputText("##Input", &inputMessage, ImGuiInputTextFlags_EnterReturnsTrue);
         ImGui::SameLine();
-        bool buttonPressed = ImGui::Button(u8"Àü¼Û", ImVec2(70, 0));
+        bool buttonPressed = ImGui::Button("ì „ì†¡", ImVec2(70, 0));
         ImGui::PopItemWidth();
 
         if ((enterPressed || buttonPressed) && !inputMessage.empty()) 
@@ -91,6 +91,12 @@ namespace ChatUI
         }
 
         ImGui::End();
+    }
+
+    void ToLobby()
+    {
+        state = State::Lobby;
+        inputMessage.clear();
     }
 
 	void Render(const std::vector<std::string>& chatMessages, Callbacks& callbacks)

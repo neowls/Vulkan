@@ -40,7 +40,7 @@ namespace VulkanUtils
                 return format;
             }
         }
-        throw std::runtime_error("Áö¿ø °¡´ÉÇÑ Æ÷¸ËÀ» Ã£À» ¼ö ¾ø½À´Ï´Ù.");
+        throw std::runtime_error("ì§€ì› ê°€ëŠ¥í•œ í¬ë§·ì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
     }
 
     VkFormat findDepthFormat()
@@ -70,7 +70,7 @@ namespace VulkanUtils
             }
         }
 
-        throw std::runtime_error("ÀûÀıÇÑ ¸Ş¸ğ¸® Å¸ÀÔÀ» Ã£À» ¼ö ¾ø½À´Ï´Ù.");
+        throw std::runtime_error("ì ì ˆí•œ ë©”ëª¨ë¦¬ íƒ€ì…ì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
     }
 
     //-----------------------------------------------------------------------------
@@ -101,7 +101,7 @@ namespace VulkanUtils
         info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
         if (vkCreateImage(g_Device, &info, nullptr, &image) != VK_SUCCESS) {
-            throw std::runtime_error("ÀÌ¹ÌÁö »ı¼º ½ÇÆĞ");
+            throw std::runtime_error("ì´ë¯¸ì§€ ìƒì„± ì‹¤íŒ¨");
         }
 
         VkMemoryRequirements memReq;
@@ -113,7 +113,7 @@ namespace VulkanUtils
         allocInfo.memoryTypeIndex = findMemoryType(memReq.memoryTypeBits, properties);
 
         if (vkAllocateMemory(g_Device, &allocInfo, nullptr, &imageMemory) != VK_SUCCESS) {
-            throw std::runtime_error("¸Ş¸ğ¸® ÇÒ´ç ½ÇÆĞ");
+            throw std::runtime_error("ë©”ëª¨ë¦¬ í• ë‹¹ ì‹¤íŒ¨");
         }
 
         vkBindImageMemory(g_Device, image, imageMemory, 0);
@@ -218,7 +218,7 @@ namespace VulkanUtils
             dstStage = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
         }
         else {
-            throw std::invalid_argument("Áö¿øÇÏÁö ¾Ê´Â ·¹ÀÌ¾Æ¿ô ÀüÈ¯ÀÔ´Ï´Ù");
+            throw std::invalid_argument("ì§€ì›í•˜ì§€ ì•ŠëŠ” ë ˆì´ì•„ì›ƒ ì „í™˜ì…ë‹ˆë‹¤");
         }
 
         vkCmdPipelineBarrier(
@@ -235,8 +235,8 @@ namespace VulkanUtils
 
     std::vector<char> readFile(const std::string& fileName)
     {
-        // ÇöÀç ÀÛ¾÷ µğ·ºÅä¸®¸¦ ±âÁØÀ¸·Î ÆÄÀÏ °æ·Î¸¦ Àı´ë °æ·Î·Î º¯È¯ÇÏ¿© Ãâ·Â
-        // ÇÁ·Î±×·¥À» ½ÇÇàÇÒ ¶§ ÀÌ °æ·Î°¡ ¹«¾ùÀÎÁö È®ÀÎÇÕ´Ï´Ù.
+        // í˜„ì¬ ì‘ì—… ë””ë ‰í† ë¦¬ë¥¼ ê¸°ì¤€ìœ¼ë¡œ íŒŒì¼ ê²½ë¡œë¥¼ ì ˆëŒ€ ê²½ë¡œë¡œ ë³€í™˜í•˜ì—¬ ì¶œë ¥
+        // í”„ë¡œê·¸ë¨ì„ ì‹¤í–‰í•  ë•Œ ì´ ê²½ë¡œê°€ ë¬´ì—‡ì¸ì§€ í™•ì¸í•©ë‹ˆë‹¤.
         std::filesystem::path current_working_dir = std::filesystem::current_path();
         std::filesystem::path fullPath = current_working_dir / fileName;
 
@@ -247,7 +247,7 @@ namespace VulkanUtils
         std::ifstream file(fileName, std::ios::ate | std::ios::binary);
         if (!file.is_open())
         {
-            throw std::runtime_error("ÆÄÀÏ ¿­±â ½ÇÆĞ: " + fileName + " (Àı´ë °æ·Î: " + fullPath.string() + ")");
+            throw std::runtime_error("íŒŒì¼ ì—´ê¸° ì‹¤íŒ¨: " + fileName + " (ì ˆëŒ€ ê²½ë¡œ: " + fullPath.string() + ")");
         }
 
         size_t fileSize = (size_t)file.tellg();
@@ -269,7 +269,7 @@ namespace VulkanUtils
         VkShaderModule shaderModule;
         if (vkCreateShaderModule(g_Device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS)
         {
-            throw std::runtime_error("½¦ÀÌ´õ ¸ğµâ »ı¼º ½ÇÆĞ");
+            throw std::runtime_error("ì‰ì´ë” ëª¨ë“ˆ ìƒì„± ì‹¤íŒ¨");
         }
 
         return shaderModule;

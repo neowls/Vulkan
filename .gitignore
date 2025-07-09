@@ -33,3 +33,9 @@
 *.vsidx
 *.ipch
 /Solutions/helloworld/.vs
+*.opendb
+*.db-wal
+*.db-shm
+*.db
+*.db
+*.db

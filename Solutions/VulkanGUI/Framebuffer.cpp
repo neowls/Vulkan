@@ -23,7 +23,7 @@ namespace Framebuffer
 
 
             if (vkCreateFramebuffer(device, &info, nullptr, &framebuffers[i]) != VK_SUCCESS)
-                throw std::runtime_error("ÇÁ·¹ÀÓ¹öÆÛ »ı¼º ½ÇÆĞ");
+                throw std::runtime_error("í”„ë ˆì„ë²„í¼ ìƒì„± ì‹¤íŒ¨");
         }
     }
 

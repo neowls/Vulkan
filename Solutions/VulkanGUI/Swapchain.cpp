@@ -15,23 +15,23 @@ namespace Swapchain
 
 	void Swapchain::setup(GLFWwindow* window, VkPhysicalDevice physicalDevice, VkDevice device, VkSurfaceKHR surface, uint32_t graphicsQueueFamily)
 	{
-		// Surface Capbilities ¡∂»∏
+		// Surface Capbilities Ï°∞Ìöå
 		VkSurfaceCapabilitiesKHR capabilities;
 		vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface, &capabilities);
 
-		// Surface Formats ¡∂»∏
+		// Surface Formats Ï°∞Ìöå
 		uint32_t formatCount = 0;
 		vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, &formatCount, nullptr);
 		std::vector<VkSurfaceFormatKHR> formats(formatCount);
 		vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, &formatCount, formats.data());
 
-		//	Present Modes ¡∂»∏
+		//	Present Modes Ï°∞Ìöå
 		uint32_t presentModeCount = 0;
 		vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, &presentModeCount, nullptr);
 		std::vector<VkPresentModeKHR> presentModes(presentModeCount);
 		vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, &presentModeCount, presentModes.data());
 
-		//	Surface Format º±≈√
+		//	Surface Format ÏÑ†ÌÉù
 		VkSurfaceFormatKHR surfaceFormat = formats[0];
 		for (const auto& f : formats)
 		{
@@ -42,7 +42,7 @@ namespace Swapchain
 			}
 		}
 
-		//	Present Mode º±≈√
+		//	Present Mode ÏÑ†ÌÉù
 		VkPresentModeKHR presentMode = VK_PRESENT_MODE_FIFO_KHR;
 		for (const auto& pm : presentModes)
 		{
@@ -53,7 +53,7 @@ namespace Swapchain
 			}
 		}
 
-		//	Extent º±≈√
+		//	Extent ÏÑ†ÌÉù
 		int width, height;
 		glfwGetFramebufferSize(window, &width, &height);
 		VkExtent2D swapExtent =
@@ -62,12 +62,12 @@ namespace Swapchain
 			static_cast<uint32_t>(std::clamp(height, (int)capabilities.minImageExtent.height, (int)capabilities.maxImageExtent.height))
 		};
 
-		//	¿ÃπÃ¡ˆ ∞≥ºˆ
+		//	Ïù¥ÎØ∏ÏßÄ Í∞úÏàò
 		uint32_t imageCount = capabilities.minImageCount + 1;
 		if (capabilities.maxImageCount > 0 && imageCount > capabilities.maxImageCount)
 			imageCount = capabilities.maxImageCount;
 
-		// SwapchainCreateInfo ºº∆√
+		// SwapchainCreateInfo ÏÑ∏ÌåÖ
 		VkSwapchainCreateInfoKHR createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
 		createInfo.surface = surface;
@@ -91,18 +91,18 @@ namespace Swapchain
 
 		if (res != VK_SUCCESS)
 		{
-			std::cerr << "Ω∫ø“√º¿Œ ª˝º∫ Ω«∆–. VkResult = " << res << std::endl;
-			throw std::runtime_error("Ω∫ø“√º¿Œ ª˝º∫ Ω«∆–.");
+			std::cerr << "Ïä§ÏôëÏ≤¥Ïù∏ ÏÉùÏÑ± Ïã§Ìå®. VkResult = " << res << std::endl;
+			throw std::runtime_error("Ïä§ÏôëÏ≤¥Ïù∏ ÏÉùÏÑ± Ïã§Ìå®.");
 		}
 			
 
-		//	¿ÃπÃ¡ˆ æÚ±‚
+		//	Ïù¥ÎØ∏ÏßÄ ÏñªÍ∏∞
 		uint32_t imgCount = 0;
 		vkGetSwapchainImagesKHR(device, swapchain, &imgCount, nullptr);
 		images.resize(imgCount);
 		vkGetSwapchainImagesKHR(device, swapchain, &imgCount, images.data());
 
-		//	¿ÃπÃ¡ˆ ∫‰ ª˝º∫
+		//	Ïù¥ÎØ∏ÏßÄ Î∑∞ ÏÉùÏÑ±
 		imageViews.resize(imageCount);
 		for (uint32_t i = 0; i < imageCount; ++i)
 		{
@@ -119,10 +119,10 @@ namespace Swapchain
 			viewInfo.subresourceRange.layerCount = 1;
 
 			if (vkCreateImageView(device, &viewInfo, nullptr, &imageViews[i]) != VK_SUCCESS)
-				throw std::runtime_error("¿ÃπÃ¡ˆ ∫‰ ª˝º∫ Ω«∆–");
+				throw std::runtime_error("Ïù¥ÎØ∏ÏßÄ Î∑∞ ÏÉùÏÑ± Ïã§Ìå®");
 		}
 
-		//	«¸Ωƒ/≈©±‚ ±‚∑œ
+		//	ÌòïÏãù/ÌÅ¨Í∏∞ Í∏∞Î°ù
 		imageFormat = surfaceFormat.format;
 		extent = swapExtent;
 	}

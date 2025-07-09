@@ -24,5 +24,6 @@ namespace ChatUI
     extern std::string serverIP;
     extern std::string inputMessage;
 
+    void ToLobby();
     void Render(const std::vector<std::string>& chatMessages, Callbacks& callbacks);
 }

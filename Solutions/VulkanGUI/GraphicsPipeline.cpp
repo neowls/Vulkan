@@ -89,7 +89,7 @@ namespace GraphicsPipeline
         pipelineLayoutInfo.pushConstantRangeCount = 0;
 
         if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &g_PipelineLayout) != VK_SUCCESS)
-            throw std::runtime_error("ÆÄÀÌÇÁ¶óÀÎ ·¹ÀÌ¾Æ¿ô »ı¼º ½ÇÆĞ");
+            throw std::runtime_error("íŒŒì´í”„ë¼ì¸ ë ˆì´ì•„ì›ƒ ìƒì„± ì‹¤íŒ¨");
 
         VkGraphicsPipelineCreateInfo pipelineInfo{};
         pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -107,7 +107,7 @@ namespace GraphicsPipeline
         pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
         if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &g_Pipeline) != VK_SUCCESS)
-            throw std::runtime_error("±×·¡ÇÈ½º ÆÄÀÌÇÁ¶óÀÎ »ı¼º ½ÇÆĞ");
+            throw std::runtime_error("ê·¸ë˜í”½ìŠ¤ íŒŒì´í”„ë¼ì¸ ìƒì„± ì‹¤íŒ¨");
 
         vkDestroyShaderModule(device, vertShaderModule, nullptr);
         vkDestroyShaderModule(device, fragShaderModule, nullptr);

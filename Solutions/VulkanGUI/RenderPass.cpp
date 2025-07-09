@@ -34,7 +34,7 @@ namespace RenderPass
 		renderPassInfo.pSubpasses = &subpass;
 
 		if (vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS)
-			throw std::runtime_error("·»´õÆĞ½º »ı¼º ½ÇÆĞ");
+			throw std::runtime_error("ë Œë”íŒ¨ìŠ¤ ìƒì„± ì‹¤íŒ¨");
 	}
 
 	void cleanup(VkDevice device)
